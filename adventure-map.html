@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adventure Map — What In The World</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #f7f6f3; color: #2c2c2c; }
+
+  .map-header {
+    padding: 28px 32px 12px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .map-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; font-weight: 400; color: #1a1a1a; letter-spacing: -0.3px;
+  }
+  .map-header p {
+    font-size: 14px; color: #6b6b6b; max-width: 520px; line-height: 1.5;
+  }
+
+  .filters {
+    display: flex; gap: 8px; flex-wrap: wrap; padding: 0 32px 8px;
+  }
+  .filter-btn {
+    padding: 7px 16px; border: 1.5px solid #d4d1cb; border-radius: 100px;
+    background: transparent; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500; color: #5a5a5a; cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .filter-btn:hover { border-color: #1a1a1a; color: #1a1a1a; }
+  .filter-btn.active { background: #1a1a1a; border-color: #1a1a1a; color: #fff; }
+  .filter-btn .dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    margin-right: 6px; vertical-align: middle; position: relative; top: -0.5px;
+  }
+
+  .stats-bar {
+    display: flex; gap: 32px; padding: 12px 32px 16px; flex-wrap: wrap;
+  }
+  .stat { display: flex; flex-direction: column; }
+  .stat-num {
+    font-family: 'DM Serif Display', serif; font-size: 26px; color: #1a1a1a;
+  }
+  .stat-label { font-size: 12px; color: #999; margin-top: 2px; }
+
+  .map-container {
+    padding: 0 32px 32px; position: relative;
+  }
+  .map-wrap {
+    position: relative; border-radius: 12px; border: 1px solid #e4e1dc;
+    overflow: hidden; background: #f2f2f0;
+  }
+  .map-wrap svg { display: block; width: 100%; height: auto; }
+  .map-wrap svg path {
+    fill: #c0c0bb; stroke: #9a9a94; stroke-width: 0.5px;
+    transition: fill 0.2s ease;
+  }
+  .map-wrap svg path:hover { fill: #b0b0a9; }
+
+  .pin-layer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  .pin {
+    position: absolute; pointer-events: all; cursor: pointer;
+    transform: translate(-50%, -50%); z-index: 2;
+    transition: transform 0.2s ease;
+  }
+  .pin:hover { transform: translate(-50%, -50%) scale(1.3); z-index: 10; }
+  .pin-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2.5px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  .pin-pulse {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 28px; height: 28px; border-radius: 50%;
+    opacity: 0; animation: pulse 2.5s ease-out infinite;
+  }
+  @keyframes pulse {
+    0% { opacity: 0.5; transform: translate(-50%,-50%) scale(0.5); }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(1.5); }
+  }
+
+  .pin.canoe .pin-dot { background: #3b82f6; }
+  .pin.canoe .pin-pulse { background: #3b82f6; }
+  .pin.sailing .pin-dot { background: #0ea5e9; }
+  .pin.sailing .pin-pulse { background: #0ea5e9; }
+  .pin.cycling .pin-dot { background: #22c55e; }
+  .pin.cycling .pin-pulse { background: #22c55e; }
+  .pin.other .pin-dot { background: #f59e0b; }
+  .pin.other .pin-pulse { background: #f59e0b; }
+
+  .popup-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.3); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .popup-overlay.active { display: flex; }
+
+  .popup {
+    background: #fff; border-radius: 14px; width: 380px; max-width: 90vw;
+    max-height: 85vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: popIn 0.25s ease-out;
+  }
+  @keyframes popIn {
+    0% { opacity: 0; transform: scale(0.92) translateY(12px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .popup-close {
+    position: absolute; top: 12px; right: 12px; width: 32px; height: 32px;
+    border-radius: 50%; border: none; background: rgba(0,0,0,0.5);
+    color: #fff; font-size: 18px; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; z-index: 2;
+  }
+  .popup-close:hover { background: rgba(0,0,0,0.7); }
+
+  .popup-video {
+    width: 100%; aspect-ratio: 16/9; background: linear-gradient(135deg,#e8e6e1,#d4d1cb);
+    border-radius: 14px 14px 0 0; overflow: hidden; position: relative;
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;
+  }
+  .popup-video iframe {
+    width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0;
+  }
+  .popup-video .placeholder-icon {
+    color: #aaa; display: flex; flex-direction: column;
+    align-items: center; gap: 6px;
+  }
+  .popup-video .placeholder-icon span { font-size: 11px; }
+
+  .popup-body { padding: 18px 20px 22px; }
+
+  .popup-tag {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 3px 10px; border-radius: 100px; margin-bottom: 8px;
+  }
+  .tag-canoe { background: #dbeafe; color: #2563eb; }
+  .tag-sailing { background: #e0f2fe; color: #0284c7; }
+  .tag-cycling { background: #dcfce7; color: #16a34a; }
+  .tag-other { background: #fef3c7; color: #d97706; }
+
+  .popup-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; font-weight: 400; margin-bottom: 8px; color: #1a1a1a;
+  }
+  .popup-desc {
+    font-size: 13.5px; line-height: 1.6; color: #6b6b6b; margin-bottom: 16px;
+  }
+  .popup-meta {
+    display: flex; gap: 20px; font-size: 12px; color: #999;
+    padding-top: 14px; border-top: 1px solid #eee;
+  }
+  .popup-meta span { display: flex; align-items: center; gap: 5px; }
+  .popup-meta svg { flex-shrink: 0; }
+
+  .popup-link {
+    display: inline-block; margin-top: 14px; font-size: 13px; font-weight: 600;
+    color: #1a1a1a; text-decoration: none; border-bottom: 1.5px solid #1a1a1a;
+    padding-bottom: 1px; transition: opacity 0.2s;
+  }
+  .popup-link:hover { opacity: 0.6; }
+
+  .pin.hidden { display: none; }
+
+  @media (max-width: 600px) {
+    .map-header { padding: 20px 16px 10px; }
+    .map-header h1 { font-size: 22px; }
+    .filters { padding: 0 16px 8px; }
+    .stats-bar { padding: 8px 16px 12px; gap: 24px; }
+    .map-container { padding: 0 16px 16px; }
+    .popup { width: 95vw; }
+  }
+</style>
+</head>
+<body>
+
+<div class="map-header">
+  <h1>Adventure Map</h1>
+  <p>Every journey, every paddle stroke, every kilometre — pinned to the places that made them unforgettable.</p>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="filterPins('all')">All Adventures</button>
+  <button class="filter-btn" onclick="filterPins('canoe')"><span class="dot" style="background:#3b82f6"></span>Canoe</button>
+  <button class="filter-btn" onclick="filterPins('sailing')"><span class="dot" style="background:#0ea5e9"></span>Sailing</button>
+  <button class="filter-btn" onclick="filterPins('cycling')"><span class="dot" style="background:#22c55e"></span>Cycling</button>
+  <button class="filter-btn" onclick="filterPins('other')"><span class="dot" style="background:#f59e0b"></span>Other</button>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><span class="stat-num">12</span><span class="stat-label">Adventures</span></div>
+  <div class="stat"><span class="stat-num">8</span><span class="stat-label">Countries</span></div>
+  <div class="stat"><span class="stat-num">14,200+</span><span class="stat-label">Kilometres</span></div>
+</div>
+
+<div class="map-container">
+  <div class="map-wrap" id="mapWrap">
+    <!-- SVG map gets injected here -->
+    <div class="pin-layer" id="pinLayer"></div>
+  </div>
+</div>
+
+<div class="popup-overlay" id="popupOverlay" onclick="closePopup(event)">
+  <div class="popup" id="popup" onclick="event.stopPropagation()"></div>
+</div>
+
+<script>
+// ── GeoViewBox conversion ──
+// mapsvg:geoViewBox="-169.110266 83.600842 190.486279 -58.508473"
+const GEO = {
+  lonMin: -169.110266,
+  latMax: 83.600842,
+  lonMax: 190.486279,
+  latMin: -58.508473,
+  svgW: 1009.6727,
+  svgH: 665.96301
+};
+
+function geoToPercent(lat, lng) {
+  const x = ((lng - GEO.lonMin) / (GEO.lonMax - GEO.lonMin)) * 100;
+  const y = ((GEO.latMax - lat) / (GEO.latMax - GEO.latMin)) * 100;
+  return { x, y };
+}
+
+// ── Adventure data (placeholders — swap with real data) ──
+const adventures = [
+  {
+    id: 1, title: "Sault Ste. Marie to Montreal",
+    type: "canoe", lat: 46.5, lng: -81.0,
+    year: "2026", distance: "1,500 km",
+    description: "The final leg of a multi-year canoe journey across Canada, paddling solo through Georgian Bay, French River, Ottawa River, and down the St. Lawrence to Montreal.",
+    videoId: "", link: "/expeditions/sault-to-montreal"
+  },
+  {
+    id: 2, title: "Lake Superior Crossing",
+    type: "canoe", lat: 48.0, lng: -87.5,
+    year: "2024", distance: "800 km",
+    description: "Solo canoe crossing of the largest freshwater lake by surface area. Cold water, big waves, remote coastline.",
+    videoId: "", link: "/expeditions/lake-superior"
+  },
+  {
+    id: 3, title: "French Polynesia Sailing",
+    type: "sailing", lat: -17.5, lng: -149.5,
+    year: "2026", distance: "450 nm",
+    description: "Island-hopping through the Society Islands aboard a chartered catamaran. Swimming with humpback whales in the deep blue.",
+    videoId: "", link: "/expeditions/french-polynesia"
+  },
+  {
+    id: 4, title: "Norwegian Fjords",
+    type: "sailing", lat: 61.2, lng: 6.8,
+    year: "2023", distance: "320 nm",
+    description: "Sailing through dramatic fjord landscapes, past waterfalls and mountain walls rising straight from the sea.",
+    videoId: "", link: "/expeditions/norway"
+  },
+  {
+    id: 5, title: "Camino de Santiago",
+    type: "cycling", lat: 42.88, lng: -8.54,
+    year: "2022", distance: "830 km",
+    description: "Cycling the ancient pilgrim route across northern Spain to Santiago de Compostela. Meseta heat, mountain passes, and unforgettable people.",
+    videoId: "", link: "/expeditions/camino"
+  },
+  {
+    id: 6, title: "Iceland Ring Road",
+    type: "cycling", lat: 64.9, lng: -18.5,
+    year: "2021", distance: "1,320 km",
+    description: "Cycling the full ring road in midsummer. Glaciers, volcanic deserts, and wind that never stopped.",
+    videoId: "", link: "/expeditions/iceland"
+  },
+  {
+    id: 7, title: "Scottish Highlands",
+    type: "other", lat: 57.0, lng: -5.5,
+    year: "2020", distance: "280 km",
+    description: "Hiking and wild camping through the Highlands. Munros, lochs, and more midges than any human should endure.",
+    videoId: "", link: "/expeditions/scotland"
+  },
+  {
+    id: 8, title: "Patagonia Traverse",
+    type: "other", lat: -50.3, lng: -73.0,
+    year: "2019", distance: "420 km",
+    description: "Trekking through Torres del Paine and beyond into Argentina. Glaciers, guanaco herds, and relentless Patagonian wind.",
+    videoId: "", link: "/expeditions/patagonia"
+  }
+];
+
+// ── Load SVG map ──
+const mapWrap = document.getElementById('mapWrap');
+const pinLayer = document.getElementById('pinLayer');
+
+// Fetch the SVG and insert it
+fetch('world.svg')
+  .then(r => r.text())
+  .then(svgText => {
+    // Parse and insert SVG before pin layer
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgText, 'image/svg+xml');
+    const svg = doc.querySelector('svg');
+    svg.setAttribute('viewBox', '0 0 ' + GEO.svgW + ' ' + GEO.svgH);
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
+    svg.style.width = '100%';
+    svg.style.height = 'auto';
+    svg.style.display = 'block';
+    mapWrap.insertBefore(svg, pinLayer);
+    createPins();
+  })
+  .catch(() => {
+    // Fallback: if fetch fails (e.g. local file), create a placeholder
+    const fallback = document.createElement('div');
+    fallback.style.cssText = 'width:100%;aspect-ratio:1009/666;background:#eef2f7;';
+    mapWrap.insertBefore(fallback, pinLayer);
+    createPins();
+  });
+
+// ── Create pin markers ──
+function createPins() {
+  adventures.forEach(adv => {
+    const pos = geoToPercent(adv.lat, adv.lng);
+    const pin = document.createElement('div');
+    pin.className = 'pin ' + adv.type;
+    pin.dataset.type = adv.type;
+    pin.style.left = pos.x + '%';
+    pin.style.top = pos.y + '%';
+    pin.innerHTML = '<div class="pin-pulse"></div><div class="pin-dot"></div>';
+    pin.addEventListener('click', () => openPopup(adv));
+    pinLayer.appendChild(pin);
+  });
+}
+
+// ── Popup ──
+function openPopup(adv) {
+  const overlay = document.getElementById('popupOverlay');
+  const popup = document.getElementById('popup');
+
+  let videoHTML = '';
+  if (adv.videoId) {
+    videoHTML = '<iframe src="https://www.youtube.com/embed/' + adv.videoId + '" allowfullscreen loading="lazy"></iframe>';
+  } else {
+    videoHTML = '<div class="placeholder-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span>Video coming soon</span></div>';
+  }
+
+  popup.innerHTML =
+    '<div class="popup-video"><button class="popup-close" onclick="closePopup()">&times;</button>' + videoHTML + '</div>' +
+    '<div class="popup-body">' +
+      '<span class="popup-tag tag-' + adv.type + '">' + adv.type + '</span>' +
+      '<div class="popup-title">' + adv.title + '</div>' +
+      '<div class="popup-desc">' + adv.description + '</div>' +
+      '<div class="popup-meta">' +
+        '<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' + adv.year + '</span>' +
+        '<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>' + adv.distance + '</span>' +
+      '</div>' +
+      '<a href="' + adv.link + '" class="popup-link">View full expedition &rarr;</a>' +
+    '</div>';
+
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePopup(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('popupOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePopup();
+});
+
+// ── Filter ──
+function filterPins(type) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.querySelectorAll('.pin').forEach(pin => {
+    if (type === 'all' || pin.dataset.type === type) {
+      pin.classList.remove('hidden');
+    } else {
+      pin.classList.add('hidden');
+    }
+  });
+}
+</script>
+</body>
+</html>
