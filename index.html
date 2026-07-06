@@ -96,8 +96,8 @@
 
   .pin.canoe .pin-dot { background: #3b82f6; }
   .pin.canoe .pin-pulse { background: #3b82f6; }
-  .pin.sailing .pin-dot { background: #0ea5e9; }
-  .pin.sailing .pin-pulse { background: #0ea5e9; }
+  .pin.sailing .pin-dot { background: #f59e0b; }
+  .pin.sailing .pin-pulse { background: #f59e0b; }
   .pin.cycling .pin-dot { background: #22c55e; }
   .pin.cycling .pin-pulse { background: #22c55e; }
   .pin.other .pin-dot { background: #f59e0b; }
@@ -244,17 +244,10 @@ function geoToPercent(lat, lng) {
 const adventures = [
   {
     id: 1, title: "Sault Ste. Marie to Montreal",
-    type: "canoe", lat: 30.0, lng: -90.0,
+    type: "canoe", lat: 25.0, lng: -90.0,
     year: "2026", distance: "1,500 km",
     description: "The final leg of a multi-year canoe journey across Canada, paddling solo through Georgian Bay, French River, Ottawa River, and down the St. Lawrence to Montreal.",
     videoId: "", link: "/expeditions/sault-to-montreal"
-  },
-  {
-    id: 2, title: "Lake Superior Crossing",
-    type: "canoe", lat: 48.0, lng: -87.5,
-    year: "2024", distance: "800 km",
-    description: "Solo canoe crossing of the largest freshwater lake by surface area. Cold water, big waves, remote coastline.",
-    videoId: "", link: "/expeditions/lake-superior"
   },
   {
     id: 3, title: "French Polynesia Sailing",
@@ -263,27 +256,6 @@ const adventures = [
     description: "Island-hopping through the Society Islands aboard a chartered catamaran. Swimming with humpback whales in the deep blue.",
     videoId: "", link: "/expeditions/french-polynesia"
   },
-  {
-    id: 4, title: "Norwegian Fjords",
-    type: "sailing", lat: 61.2, lng: 6.8,
-    year: "2023", distance: "320 nm",
-    description: "Sailing through dramatic fjord landscapes, past waterfalls and mountain walls rising straight from the sea.",
-    videoId: "", link: "/expeditions/norway"
-  },
-  {
-    id: 5, title: "Scottish Highlands",
-    type: "other", lat: 57.0, lng: -5.5,
-    year: "2020", distance: "280 km",
-    description: "Hiking and wild camping through the Highlands. Munros, lochs, and more midges than any human should endure.",
-    videoId: "", link: "/expeditions/scotland"
-  },
-  {
-    id: 8, title: "Patagonia Traverse",
-    type: "other", lat: -50.3, lng: -73.0,
-    year: "2019", distance: "420 km",
-    description: "Trekking through Torres del Paine and beyond into Argentina. Glaciers, guanaco herds, and relentless Patagonian wind.",
-    videoId: "", link: "/expeditions/patagonia"
-  }
 ];
 
 // ── Load SVG map ──
