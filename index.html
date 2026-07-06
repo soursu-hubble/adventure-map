@@ -192,14 +192,12 @@
 
 <div class="map-header">
   <h1>Adventure Map</h1>
-  <p>Every journey, every paddle stroke, every kilometre — pinned to the places that made them unforgettable.</p>
 </div>
 
 <div class="filters">
   <button class="filter-btn active" onclick="filterPins('all')">All Adventures</button>
   <button class="filter-btn" onclick="filterPins('canoe')"><span class="dot" style="background:#3b82f6"></span>Canoe</button>
   <button class="filter-btn" onclick="filterPins('sailing')"><span class="dot" style="background:#0ea5e9"></span>Sailing</button>
-  <button class="filter-btn" onclick="filterPins('cycling')"><span class="dot" style="background:#22c55e"></span>Cycling</button>
   <button class="filter-btn" onclick="filterPins('other')"><span class="dot" style="background:#f59e0b"></span>Other</button>
 </div>
 
@@ -273,21 +271,7 @@ const adventures = [
     videoId: "", link: "/expeditions/norway"
   },
   {
-    id: 5, title: "Camino de Santiago",
-    type: "cycling", lat: 42.88, lng: -8.54,
-    year: "2022", distance: "830 km",
-    description: "Cycling the ancient pilgrim route across northern Spain to Santiago de Compostela. Meseta heat, mountain passes, and unforgettable people.",
-    videoId: "", link: "/expeditions/camino"
-  },
-  {
-    id: 6, title: "Iceland Ring Road",
-    type: "cycling", lat: 64.9, lng: -18.5,
-    year: "2021", distance: "1,320 km",
-    description: "Cycling the full ring road in midsummer. Glaciers, volcanic deserts, and wind that never stopped.",
-    videoId: "", link: "/expeditions/iceland"
-  },
-  {
-    id: 7, title: "Scottish Highlands",
+    id: 5, title: "Scottish Highlands",
     type: "other", lat: 57.0, lng: -5.5,
     year: "2020", distance: "280 km",
     description: "Hiking and wild camping through the Highlands. Munros, lochs, and more midges than any human should endure.",
