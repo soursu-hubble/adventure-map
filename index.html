@@ -10,6 +10,13 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'DM Sans', sans-serif; background: #f7f6f3; color: #2c2c2c; }
 
+  body.embed .map-header,
+  body.embed .filters,
+  body.embed .stats-bar { display: none; }
+  body.embed .map-container { padding: 0; height: 100vh; }
+  body.embed .map-wrap { border-radius: 0; border: none; height: 100%; }
+  body.embed { background: #f2f2f0; }
+
   .map-header {
     padding: 28px 32px 12px;
     display: flex; flex-direction: column; gap: 12px;
@@ -214,6 +221,10 @@
 </div>
 
 <script>
+// ── Embed mode ──
+if (new URLSearchParams(window.location.search).has('embed')) {
+  document.body.classList.add('embed');
+}
 // ── GeoViewBox conversion ──
 // mapsvg:geoViewBox="-169.110266 83.600842 190.486279 -58.508473"
 const GEO = {
