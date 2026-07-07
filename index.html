@@ -178,13 +178,15 @@
 
   .pin.hidden { display: none; }
 
-  @media (max-width: 600px) {
+@media (max-width: 600px) {
     .map-header { padding: 20px 16px 10px; }
     .map-header h1 { font-size: 22px; }
     .filters { padding: 0 16px 8px; }
     .stats-bar { padding: 8px 16px 12px; gap: 24px; }
-    .map-container { padding: 0 16px 16px; }
-    .popup { width: 95vw; }
+    .map-container { padding: 0; }
+    .map-wrap { border-radius: 0; border-left: none; border-right: none; }
+    .popup { position: fixed; width: 95vw; left: 2.5vw !important; top: 50% !important; transform: translateY(-50%); }
+    html, body { height: auto; min-height: 0; }
   }
 </style>
 </head>
