@@ -110,7 +110,7 @@
   .popup-overlay.active { display: block; }
 
   .popup {
-    position: absolute; background: #fff; border-radius: 14px;
+    position: fixed; background: #fff; border-radius: 14px;
     width: 420px; max-width: 90vw; max-height: 80vh; overflow-y: auto;
     box-shadow: 0 12px 40px rgba(0,0,0,0.25);
     animation: popIn 0.2s ease-out; z-index: 101;
@@ -343,14 +343,18 @@ function openPopup(adv, pinElement) {
 
   var rect = pinElement.getBoundingClientRect();
   var popupWidth = 420;
-  var scrollY = window.scrollY;
   var left = rect.right + 12;
   if (left + popupWidth > window.innerWidth) {
     left = rect.left - popupWidth - 12;
   }
   if (left < 8) left = 8;
+  var top = rect.top - 40;
+  if (top + popup.offsetHeight > window.innerHeight - 16) {
+    top = window.innerHeight - popup.offsetHeight - 16;
+  }
+  if (top < 16) top = 16;
   popup.style.left = left + 'px';
-  popup.style.top = (rect.top + scrollY - 40) + 'px';
+  popup.style.top = top + 'px';
 }
 
 function closePopup(e) {
