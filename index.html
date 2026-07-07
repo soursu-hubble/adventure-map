@@ -67,7 +67,6 @@
     transition: fill 0.2s ease;
   }
   .map-wrap svg path:hover { fill: #b0b0a9; }
-  .map-wrap svg #CA { fill: #5a8f6a; }
 
   .pin-layer {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -201,7 +200,12 @@
   <button class="filter-btn" onclick="filterPins('sailing')"><span class="dot" style="background:#3b82f6"></span>Sailing</button>
   <button class="filter-btn" onclick="filterPins('other')"><span class="dot" style="background:#f59e0b"></span>Other</button>
 </div>
-
+<div class="filters" style="padding-top:0; margin-top:-4px;">
+  <span style="font-size:13px; color:#5a5a5a; display:flex; align-items:center; gap:6px;">
+    <span style="display:inline-block; width:14px; height:14px; background:repeating-linear-gradient(45deg, #c0c0bb, #c0c0bb 2px, #4a7c59 2px, #4a7c59 3.5px); border-radius:2px;"></span>
+    Current Adventure
+  </span>
+</div>
 <div class="stats-bar">
   <div class="stat"><span class="stat-num">12</span><span class="stat-label">Adventures</span></div>
   <div class="stat"><span class="stat-num">8</span><span class="stat-label">Countries</span></div>
@@ -277,6 +281,13 @@ fetch('world.svg')
     svg.style.width = '100%';
     svg.style.height = 'auto';
     svg.style.display = 'block';
+    // Add hatch pattern for current adventure country
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML = '<pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)"><rect width="6" height="6" fill="#c0c0bb"/><line x1="0" y1="0" x2="0" y2="6" stroke="#4a7c59" stroke-width="1.5"/></pattern>';
+    svg.insertBefore(defs, svg.firstChild);
+    // Apply to current adventure country
+    var ca = svg.getElementById('CA');
+    if (ca) ca.style.fill = 'url(#hatch)';
     mapWrap.insertBefore(svg, pinLayer);
     createPins();
   })
