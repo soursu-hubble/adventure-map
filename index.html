@@ -103,18 +103,18 @@
   .pin.other .pin-dot { background: #f59e0b; }
   .pin.other .pin-pulse { background: #f59e0b; }
 
-  .popup-overlay {
+.popup-overlay {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.3); z-index: 100;
-    align-items: center; justify-content: center;
+    background: transparent; z-index: 100;
   }
-  .popup-overlay.active { display: flex; }
+  .popup-overlay.active { display: block; }
 
   .popup {
-    background: #fff; border-radius: 14px; width: 380px; max-width: 90vw;
-    max-height: 85vh; overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    animation: popIn 0.25s ease-out;
+    position: absolute; background: #fff; border-radius: 14px;
+    width: 420px; max-width: 90vw; max-height: 80vh; overflow-y: auto;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    animation: popIn 0.2s ease-out; z-index: 101;
+  }
   }
   @keyframes popIn {
     0% { opacity: 0; transform: scale(0.92) translateY(12px); }
@@ -309,13 +309,13 @@ function createPins() {
     pin.style.left = pos.x + '%';
     pin.style.top = pos.y + '%';
     pin.innerHTML = '<div class="pin-pulse"></div><div class="pin-dot"></div>';
-    pin.addEventListener('click', () => openPopup(adv));
+    pin.addEventListener('click', function() { openPopup(adv, this); });
     pinLayer.appendChild(pin);
   });
 }
 
 // ── Popup ──
-function openPopup(adv) {
+function openPopup(adv, pinElement) {
   const overlay = document.getElementById('popupOverlay');
   const popup = document.getElementById('popup');
 
@@ -340,7 +340,17 @@ function openPopup(adv) {
     '</div>';
 
   overlay.classList.add('active');
-  document.body.style.overflow = 'hidden';
+
+  var rect = pinElement.getBoundingClientRect();
+  var popupWidth = 420;
+  var scrollY = window.scrollY;
+  var left = rect.right + 12;
+  if (left + popupWidth > window.innerWidth) {
+    left = rect.left - popupWidth - 12;
+  }
+  if (left < 8) left = 8;
+  popup.style.left = left + 'px';
+  popup.style.top = (rect.top + scrollY - 40) + 'px';
 }
 
 function closePopup(e) {
