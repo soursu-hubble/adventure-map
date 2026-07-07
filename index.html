@@ -115,7 +115,6 @@
     box-shadow: 0 12px 40px rgba(0,0,0,0.25);
     animation: popIn 0.2s ease-out; z-index: 101;
   }
-  }
   @keyframes popIn {
     0% { opacity: 0; transform: scale(0.92) translateY(12px); }
     100% { opacity: 1; transform: scale(1) translateY(0); }
@@ -343,8 +342,10 @@ function openPopup(adv, pinElement) {
       (adv.link ? '<a href="' + adv.link + '" class="popup-link" target="_top">View full expedition &rarr;</a>' : '') +
     '</div>';
 
-  overlay.classList.add('active');
+   overlay.classList.add('active');
 
+  // Wait one frame for popup to render before positioning
+  requestAnimationFrame(function() {
   var rect = pinElement.getBoundingClientRect();
   var popupWidth = 420;
   var left = rect.right + 12;
@@ -358,7 +359,8 @@ function openPopup(adv, pinElement) {
   }
   if (top < 16) top = 16;
   popup.style.left = left + 'px';
-  popup.style.top = top + 'px';
+ popup.style.top = top + 'px';
+  });
 }
 
 function closePopup(e) {
