@@ -344,22 +344,19 @@ function openPopup(adv, pinElement) {
 
    overlay.classList.add('active');
 
-  // Wait one frame for popup to render before positioning
+// Center popup on screen, offset horizontally from pin
   requestAnimationFrame(function() {
   var rect = pinElement.getBoundingClientRect();
   var popupWidth = 420;
+  var popupHeight = popup.offsetHeight;
   var left = rect.right + 12;
   if (left + popupWidth > window.innerWidth) {
     left = rect.left - popupWidth - 12;
   }
-  if (left < 8) left = 8;
-  var top = rect.top - 40;
-  if (top + popup.offsetHeight > window.innerHeight - 16) {
-    top = window.innerHeight - popup.offsetHeight - 16;
-  }
-  if (top < 16) top = 16;
+  if (left < 8) left = (window.innerWidth - popupWidth) / 2;
+  var top = (window.innerHeight - popupHeight) / 2;
   popup.style.left = left + 'px';
- popup.style.top = top + 'px';
+  popup.style.top = top + 'px';
   });
 }
 
