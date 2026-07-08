@@ -104,16 +104,17 @@
   .pin.other .pin-pulse { background: #f59e0b; }
 
 .popup-overlay {
-    display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.1); z-index: 100;
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: transparent; z-index: 100;
   }
-  .popup-overlay.active { display: flex; align-items: center; justify-content: center; }
+  .popup-overlay.active { display: block; }
 
   .popup {
-    background: #fff; border-radius: 14px;
-    width: 420px; max-width: 90vw; max-height: 90%; overflow-y: auto;
+    position: fixed; background: #fff; border-radius: 14px;
+    width: 420px; max-width: 90vw; max-height: 80vh; overflow-y: auto;
     box-shadow: 0 12px 40px rgba(0,0,0,0.25);
     animation: popIn 0.2s ease-out; z-index: 101;
+    top: 50% !important; left: 50% !important; transform: translate(-50%, -50%);
   }
  
    @keyframes popIn {
@@ -220,10 +221,11 @@
   <div class="map-wrap" id="mapWrap">
     <!-- SVG map gets injected here -->
     <div class="pin-layer" id="pinLayer"></div>
-    <div class="popup-overlay" id="popupOverlay" onclick="closePopup(event)">
-      <div class="popup" id="popup" onclick="event.stopPropagation()"></div>
-    </div>
   </div>
+</div>
+
+<div class="popup-overlay" id="popupOverlay" onclick="closePopup(event)">
+  <div class="popup" id="popup" onclick="event.stopPropagation()"></div>
 </div>
 
 <script>
@@ -344,7 +346,7 @@ function openPopup(adv, pinElement) {
 
    overlay.classList.add('active');
 
-// Popup is centered by CSS flexbox, no manual positioning needed
+// Popup is centered by CSS, no positioning calculation needed
 }
 
 function closePopup(e) {
