@@ -258,11 +258,13 @@ fetch('world.svg')
     const doc = parser.parseFromString(svgText, 'image/svg+xml');
     const svg = doc.querySelector('svg');
     svg.setAttribute('viewBox', '0 0 ' + GEO.svgW + ' ' + GEO.svgH);
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     svg.removeAttribute('width');
     svg.removeAttribute('height');
     svg.style.width = '100%';
-    svg.style.height = 'auto';
+    svg.style.height = '100%';
     svg.style.display = 'block';
+    svg.style.overflow = 'hidden';
     // Apply to current adventure country
     var ca = svg.getElementById('CA');
     if (ca) ca.style.fill = '#4a7c59';
