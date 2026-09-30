@@ -20,6 +20,7 @@
   .map-header {
     padding: 28px 32px 12px;
     display: flex; flex-direction: column; gap: 12px;
+    margin-bottom: 0;
   }
   .map-header h1 {
     font-family: 'DM Serif Display', serif;
@@ -55,7 +56,7 @@
   .stat-label { font-size: 12px; color: #999; margin-top: 2px; }
 
   .map-container {
-    padding: 0 32px 32px; position: relative;
+    padding: 0 32px 32px; position: relative; height: 500px;
   }
   .map-wrap {
     position: relative; border-radius: 12px; border: 1px solid #e4e1dc;
@@ -116,7 +117,7 @@
     animation: popIn 0.2s ease-out; z-index: 101;
     top: 50% !important; left: 50% !important; transform: translate(-50%, -50%);
   }
- 
+
    @keyframes popIn {
     0% { opacity: 0; }
     100% { opacity: 1; }
@@ -182,9 +183,7 @@
 @media (max-width: 600px) {
     .map-header { padding: 20px 16px 10px; }
     .map-header h1 { font-size: 22px; }
-    .filters { padding: 0 16px 8px; }
-    .stats-bar { padding: 8px 16px 12px; gap: 24px; }
-    .map-container { padding: 0; }
+    .map-container { padding: 0; height: 300px; }
     .map-wrap { border-radius: 0; border-left: none; border-right: none; }
     .popup { width: 95%; }
     html, body { height: auto; min-height: 0; }
@@ -197,30 +196,9 @@
   <h1>Adventure Map</h1>
 </div>
 
-<div class="filters">
-  <button class="filter-btn active" onclick="filterPins('all')">All Adventures</button>
-  <button class="filter-btn" onclick="filterPins('canoe')"><span class="dot" style="background:#22c55e"></span>Canoe</button>
-  <button class="filter-btn" onclick="filterPins('sailing')"><span class="dot" style="background:#3b82f6"></span>Sailing</button>
-  <button class="filter-btn" onclick="filterPins('other')"><span class="dot" style="background:#f59e0b"></span>Other</button>
-</div>
-<div class="filters" style="padding-top:4px; padding-bottom:12px;">
-  <span style="font-size:14px; font-weight:500; color:#4a7c59; display:flex; align-items:center; gap:8px;">
-    <span style="display:inline-block; width:18px; height:18px; background:repeating-linear-gradient(45deg, #c0c0bb, #c0c0bb 2px, #4a7c59 2px, #4a7c59 3.5px); border-radius:3px;"></span>
-    Current Adventure
-  </span>
-</div>
-<!--
-<div class="stats-bar">
-  <div class="stat"><span class="stat-num">12</span><span class="stat-label">Adventures</span></div>
-  <div class="stat"><span class="stat-num">8</span><span class="stat-label">Countries</span></div>
-  <div class="stat"><span class="stat-num">14,200+</span><span class="stat-label">Kilometres</span></div>
-</div>
--->
-
 <div class="map-container">
   <div class="map-wrap" id="mapWrap">
     <!-- SVG map gets injected here -->
-    <div class="pin-layer" id="pinLayer"></div>
   </div>
 </div>
 
@@ -270,7 +248,6 @@ const adventures = [
 
 // ── Load SVG map ──
 const mapWrap = document.getElementById('mapWrap');
-const pinLayer = document.getElementById('pinLayer');
 
 // Fetch the SVG and insert it
 fetch('world.svg')
@@ -293,31 +270,16 @@ fetch('world.svg')
     // Apply to current adventure country
     var ca = svg.getElementById('CA');
     if (ca) ca.style.fill = 'url(#hatch)';
-    mapWrap.insertBefore(svg, pinLayer);
-    createPins();
+    mapWrap.appendChild(svg);
+    // Pins removed — expedition details now in Squarespace code blocks
   })
   .catch(() => {
     // Fallback: if fetch fails (e.g. local file), create a placeholder
     const fallback = document.createElement('div');
     fallback.style.cssText = 'width:100%;aspect-ratio:1009/666;background:#eef2f7;';
     mapWrap.insertBefore(fallback, pinLayer);
-    createPins();
   });
 
-// ── Create pin markers ──
-function createPins() {
-  adventures.forEach(adv => {
-    const pos = geoToPercent(adv.lat, adv.lng);
-    const pin = document.createElement('div');
-    pin.className = 'pin ' + adv.type;
-    pin.dataset.type = adv.type;
-    pin.style.left = pos.x + '%';
-    pin.style.top = pos.y + '%';
-    pin.innerHTML = '<div class="pin-pulse"></div><div class="pin-dot"></div>';
-    pin.addEventListener('click', function() { openPopup(adv, this); });
-    pinLayer.appendChild(pin);
-  });
-}
 
 // ── Popup ──
 function openPopup(adv, pinElement) {
