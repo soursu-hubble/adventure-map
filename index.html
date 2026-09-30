@@ -56,7 +56,7 @@
   .stat-label { font-size: 12px; color: #999; margin-top: 2px; }
 
   .map-container {
-    padding: 0 32px 32px; position: relative; height: 500px;
+    padding: 0 32px 32px; position: relative; height: 350px;
   }
   .map-wrap {
     position: relative; border-radius: 12px; border: 1px solid #e4e1dc;
@@ -183,7 +183,7 @@
 @media (max-width: 600px) {
     .map-header { padding: 20px 16px 10px; }
     .map-header h1 { font-size: 22px; }
-    .map-container { padding: 0; height: 300px; }
+    .map-container { padding: 0; height: 250px; }
     .map-wrap { border-radius: 0; border-left: none; border-right: none; }
     .popup { width: 95%; }
     html, body { height: auto; min-height: 0; }
@@ -193,7 +193,7 @@
 <body>
 
 <div class="map-header">
-  <h1>Adventure Map</h1>
+  <h1>Adventure Map — What In The World</h1>
 </div>
 
 <div class="map-container">
@@ -263,13 +263,9 @@ fetch('world.svg')
     svg.style.width = '100%';
     svg.style.height = 'auto';
     svg.style.display = 'block';
-    // Add hatch pattern for current adventure country
-    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-    defs.innerHTML = '<pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)"><rect width="6" height="6" fill="#c0c0bb"/><line x1="0" y1="0" x2="0" y2="6" stroke="#4a7c59" stroke-width="1.5"/></pattern>';
-    svg.insertBefore(defs, svg.firstChild);
     // Apply to current adventure country
     var ca = svg.getElementById('CA');
-    if (ca) ca.style.fill = 'url(#hatch)';
+    if (ca) ca.style.fill = '#4a7c59';
     mapWrap.appendChild(svg);
     // Pins removed — expedition details now in Squarespace code blocks
   })
